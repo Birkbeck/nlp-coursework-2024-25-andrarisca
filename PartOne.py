@@ -4,7 +4,7 @@
 import nltk
 import spacy
 from pathlib import Path
-
+import re
 
 nlp = spacy.load("en_core_web_sm")
 nlp.max_length = 2000000
@@ -12,30 +12,39 @@ nlp.max_length = 2000000
 
 
 def fk_level(text, d):
-    """Returns the Flesch-Kincaid Grade Level of a text (higher grade is more difficult).
-    Requires a dictionary of syllables per word.
-
-    Args:
-        text (str): The text to analyze.
-        d (dict): A dictionary of syllables per word.
-
-    Returns:
-        float: The Flesch-Kincaid Grade Level of the text. (higher grade is more difficult)
-    """
+    raw_lines = nltk.sent_tokenize(text)
+    tokens = nltk.word_tokenize(text)
+    lines = len(raw_lines)
+    vocab_length = 0
+    syll_length = 0
+    for t in tokens:
+        if t.isalpha():
+            vocab_length += 1
+            syll_length += count_syl(t, d)
+            
+    if lines == 0 or vocab_length == 0:
+        return 0.0
+    
+    words_line = vocab_length / lines
+    syll_word = syll_length / vocab_length
+    flesch_level = 0.39 * words_line + 11.8 * syll_word - 15.59
+    
+    return flesch_level
     pass
 
 
 def count_syl(word, d):
-    """Counts the number of syllables in a word given a dictionary of syllables per word.
-    if the word is not in the dictionary, syllables are estimated by counting vowel clusters
-
-    Args:
-        word (str): The word to count syllables for.
-        d (dict): A dictionary of syllables per word.
-
-    Returns:
-        int: The number of syllables in the word.
-    """
+    word = word.lower()
+    if word in d:
+        pronunciation = d[word][0]
+        count = 0
+        for p in pronunciation:
+            if p[-1].isdigit():
+                count += 1
+        return count
+    else:
+        vowels = re.findall(r"[aeiouy]+", word)
+        return len(vowels)
     pass
 
 
