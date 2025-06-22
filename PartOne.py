@@ -5,6 +5,10 @@ import nltk
 import spacy
 from pathlib import Path
 import re
+import pandas as pd 
+import pickle
+import os
+
 
 nlp = spacy.load("en_core_web_sm")
 nlp.max_length = 2000000
@@ -48,15 +52,55 @@ def count_syl(word, d):
     pass
 
 
-def read_novels(path=Path.cwd() / "texts" / "novels"):
-    """Reads texts from a directory of .txt files and returns a DataFrame with the text, title,
-    author, and year"""
+def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
+    novels = []
+    for file in path.glob("*.txt"):
+        name_parts = file.stem.split("-")
+        if len(name_parts) < 3:
+            continue
+        
+        title = name_parts[0].strip()
+        author = name_parts[1].strip()
+        year_str = name_parts[2].strip()
+        
+        if not year_str.isdigit():
+            continue
+        
+        year = int(year_str)
+        with open(file, "r", encoding="utf-8") as f:
+            text = f.read()
+            
+        book = {
+            "text": text,
+            "title": title,
+            "author": author,
+            "year": year
+        }
+        novels.append(book)
+    df = pd.DataFrame(novels)
+    df = df.sort_values("year")
+    df = df.reset_index(drop=True)
+    return df
     pass
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
-    """Parses the text of a DataFrame using spaCy, stores the parsed docs as a column and writes 
-    the resulting  DataFrame to a pickle file"""
+    if not os.path.exists(store_path):
+        os.makedirs(store_path)
+        
+    parsed_t = []
+    for t in df["text"]:
+        doc = nlp(t)
+        parsed_t.append(doc)
+        
+    df["parsed"] = parsed_t
+    save_path = store_path / out_name
+    
+    f = open(save_path, "wb")
+    pickle.dump(df, f)
+    f.close()
+    return df
+    
     pass
 
 
