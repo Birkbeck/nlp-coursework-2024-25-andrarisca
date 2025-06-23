@@ -8,6 +8,8 @@ import re
 import pandas as pd 
 import pickle
 import os
+import math
+from collections import Counter
 
 
 nlp = spacy.load("en_core_web_sm")
@@ -81,7 +83,8 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
     df = df.sort_values("year")
     df = df.reset_index(drop=True)
     return df
-    pass
+
+    
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
@@ -105,7 +108,19 @@ def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
 
 
 def nltk_ttr(text):
-    """Calculates the type-token ratio of a text. Text is tokenized using nltk.word_tokenize."""
+    tokens = nltk.word_tokenize(text)
+    word_list = []
+    for w in tokens:
+        if w.isalpha():
+            word_list.append(w.lower())
+    
+    word_count = len(word_list)
+    if word_count == 0:
+        return 0.0
+    
+    unique_count = len(set(word_list))
+    ttr_value = unique_count / word_count
+    return ttr_value
     pass
 
 
@@ -127,39 +142,79 @@ def get_fks(df):
 
 
 def subjects_by_verb_pmi(doc, target_verb):
-    """Extracts the most common subjects of a given verb in a parsed document. Returns a list."""
+    total_tokens = len(doc)
+    subj_list = []
+    all_words = []
+    
+    for token in doc:
+        if token.is_alpha:
+            all_words.append(token.text.lower())
+            
+        if token.lemma_ == target_verb and token.pos_ == "VERB":
+            for k in token.children:
+                if k.dep_ == "nsubj" or k.dep_ == "nsubjpass":
+                    subj_list.append(k.text.lower())
+                    
+    subj_counts = Counter(subj_list)
+    word_counts = Counter(all_words)
+    pmi_scores = {}
+    
+    for s in subj_counts:
+        p_subject = word_counts[s] / total_tokens
+        p_verb = word_counts[target_verb] / total_tokens
+        p_joint = subj_counts[s] / total_tokens
+        
+        if p_subject > 0 and p_verb > 0 and p_joint > 0:
+            pmi = math.log2(p_joint / (p_subject * p_verb))
+            pmi_scores[s] = pmi
+            
+    sorted_pmi = sorted(pmi_scores.items(), key = lambda x: x[1], reverse = True)
+    return sorted_pmi[:10]
     pass
 
 
 
 def subjects_by_verb_count(doc, verb):
-    """Extracts the most common subjects of a given verb in a parsed document. Returns a list."""
+    subj_list = []
+    for token in doc:
+        if token.lemma_ == verb and token.pos_ == "VERB":
+            kids = token.children
+            for k in kids:
+                if k.dep_ == "nsubj" or k.dep_ == "nsubjpass":
+                    subj_list.append(k.text.lower())
+                    
+    c = Counter(subj_list)
+    return c.most_common(10)
     pass
 
 
 
 def adjective_counts(doc):
-    """Extracts the most common adjectives in a parsed document. Returns a list of tuples."""
+    adj_list = []
+    for t in doc:
+        if t.pos_ == "ADJ":
+            adj_list.append(t.text.lower())
+            
+    counts = Counter(adj_list)
+    return counts.most_common(10)
     pass
 
 
 
 if __name__ == "__main__":
-    """
-    uncomment the following lines to run the functions once you have completed them
-    """
-    #path = Path.cwd() / "p1-texts" / "novels"
-    #print(path)
-    #df = read_novels(path) # this line will fail until you have completed the read_novels function above.
-    #print(df.head())
-    #nltk.download("cmudict")
-    #parse(df)
-    #print(df.head())
-    #print(get_ttrs(df))
-    #print(get_fks(df))
-    #df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
-    # print(adjective_counts(df))
-    """ 
+    
+    path = Path.cwd() / "p1-texts" / "novels"
+    print(path)
+    df = read_novels(path) # this line will fail until you have completed the read_novels function above.
+    print(df.head())
+    nltk.download("cmudict")
+    parse(df)
+    print(df.head())
+    print(get_ttrs(df))
+    print(get_fks(df))
+    df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
+    print(adjective_counts(df))
+    
     for i, row in df.iterrows():
         print(row["title"])
         print(subjects_by_verb_count(row["parsed"], "hear"))
@@ -169,5 +224,5 @@ if __name__ == "__main__":
         print(row["title"])
         print(subjects_by_verb_pmi(row["parsed"], "hear"))
         print("\n")
-    """
+    
 
