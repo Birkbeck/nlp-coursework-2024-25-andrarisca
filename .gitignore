@@ -2,6 +2,8 @@
 p1-texts/novels/
 p2-texts/
 
+*.pickle
+/pickles/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

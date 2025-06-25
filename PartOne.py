@@ -10,7 +10,9 @@ import pickle
 import os
 import math
 from collections import Counter
-
+from pathlib import Path
+nltk.word_tokenize = lambda text: [w for w in text.split() if w.isalpha()]
+#j
 
 nlp = spacy.load("en_core_web_sm")
 nlp.max_length = 2000000
@@ -18,25 +20,29 @@ nlp.max_length = 2000000
 
 
 def fk_level(text, d):
-    raw_lines = nltk.sent_tokenize(text)
-    tokens = nltk.word_tokenize(text)
-    lines = len(raw_lines)
-    vocab_length = 0
-    syll_length = 0
-    for t in tokens:
-        if t.isalpha():
-            vocab_length += 1
-            syll_length += count_syl(t, d)
-            
-    if lines == 0 or vocab_length == 0:
+    sentence_count = 0
+    word_count = 0
+    syllable_count = 0
+
+    for t in text:
+        if t.text in [".", "!", "?"]:
+            sentence_count += 1
+
+    for t in text:
+        word = t.text
+        if word.isalpha():
+            word_count += 1
+            syllable_count += count_syl(word, d)
+
+    if sentence_count == 0 or word_count == 0:
         return 0.0
-    
-    words_line = vocab_length / lines
-    syll_word = syll_length / vocab_length
-    flesch_level = 0.39 * words_line + 11.8 * syll_word - 15.59
-    
-    return flesch_level
-    pass
+
+    words_per_sentence = word_count / sentence_count
+    syllables_per_word = syllable_count / word_count
+
+    flesch_score = 0.39 * words_per_sentence + 11.8 * syllables_per_word - 15.59
+
+    return flesch_score
 
 
 def count_syl(word, d):
@@ -61,9 +67,9 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
         if len(name_parts) < 3:
             continue
         
-        title = name_parts[0].strip()
-        author = name_parts[1].strip()
-        year_str = name_parts[2].strip()
+        title = "-".join(name_parts[:2]).strip()
+        author = name_parts[-2].strip()
+        year_str = name_parts[-1].strip()
         
         if not year_str.isdigit():
             continue
@@ -84,7 +90,7 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
     df = df.reset_index(drop=True)
     return df
 
-    
+
 
 
 def parse(df, store_path=Path.cwd() / "pickles", out_name="parsed.pickle"):
@@ -113,7 +119,7 @@ def nltk_ttr(text):
     for w in tokens:
         if w.isalpha():
             word_list.append(w.lower())
-    
+            
     word_count = len(word_list)
     if word_count == 0:
         return 0.0
@@ -121,7 +127,6 @@ def nltk_ttr(text):
     unique_count = len(set(word_list))
     ttr_value = unique_count / word_count
     return ttr_value
-    pass
 
 
 def get_ttrs(df):
@@ -137,7 +142,8 @@ def get_fks(df):
     results = {}
     cmudict = nltk.corpus.cmudict.dict()
     for i, row in df.iterrows():
-        results[row["title"]] = round(fk_level(row["text"], cmudict), 4)
+        fk = fk_level(row["parsed"], cmudict)
+        results[row["title"]] = round(fk, 4)
     return results
 
 
@@ -170,7 +176,7 @@ def subjects_by_verb_pmi(doc, target_verb):
             
     sorted_pmi = sorted(pmi_scores.items(), key = lambda x: x[1], reverse = True)
     return sorted_pmi[:10]
-    pass
+    
 
 
 
@@ -185,7 +191,7 @@ def subjects_by_verb_count(doc, verb):
                     
     c = Counter(subj_list)
     return c.most_common(10)
-    pass
+    
 
 
 
@@ -197,7 +203,7 @@ def adjective_counts(doc):
             
     counts = Counter(adj_list)
     return counts.most_common(10)
-    pass
+
 
 
 
@@ -212,7 +218,7 @@ if __name__ == "__main__":
     print(df.head())
     print(get_ttrs(df))
     print(get_fks(df))
-    df = pd.read_pickle(Path.cwd() / "pickles" /"name.pickle")
+    df = pd.read_pickle(Path.cwd() / "pickles" /"parsed.pickle")
     print(adjective_counts(df))
     
     for i, row in df.iterrows():
