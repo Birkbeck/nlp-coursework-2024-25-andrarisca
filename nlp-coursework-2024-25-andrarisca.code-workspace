@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../p1-texts"
+		},
+		{
+			"path": "../p2-texts"
+		}
+	],
+	"settings": {}
+}
