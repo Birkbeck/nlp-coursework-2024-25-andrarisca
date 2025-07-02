@@ -1,5 +1,4 @@
-#Re-assessment template 2025
-# Note: The template functions here and the dataframe format for structuring your solution is a suggested but not mandatory approach. You can use a different approach if you like, as long as you clearly answer the questions and communicate your answers clearly.
+
 
 import nltk
 import spacy
@@ -11,8 +10,7 @@ import os
 import math
 from collections import Counter
 from pathlib import Path
-nltk.word_tokenize = lambda text: [w for w in text.split() if w.isalpha()]
-#j
+
 
 nlp = spacy.load("en_core_web_sm")
 nlp.max_length = 2000000
@@ -67,10 +65,11 @@ def read_novels(path=Path.cwd() / "p1-texts" / "novels"):
         if len(name_parts) < 3:
             continue
         
-        title = "-".join(name_parts[:2]).strip()
+        
         author = name_parts[-2].strip()
         year_str = name_parts[-1].strip()
-        
+        title = "-".join(name_parts[:-2]).strip()
+
         if not year_str.isdigit():
             continue
         
@@ -211,15 +210,20 @@ if __name__ == "__main__":
     
     path = Path.cwd() / "p1-texts" / "novels"
     print(path)
-    df = read_novels(path) # this line will fail until you have completed the read_novels function above.
+    df = read_novels(path) 
     print(df.head())
     nltk.download("cmudict")
-    parse(df)
-    print(df.head())
+    
+    df = parse(df)
+    df.to_pickle(Path.cwd() / "pickles" / "parsed.pickle")
     print(get_ttrs(df))
     print(get_fks(df))
     df = pd.read_pickle(Path.cwd() / "pickles" /"parsed.pickle")
-    print(adjective_counts(df))
+    
+    for i, row in df.iterrows():
+        print(row["title"])
+        print(adjective_counts(row["parsed"]))
+
     
     for i, row in df.iterrows():
         print(row["title"])

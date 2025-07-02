@@ -1,1 +1,15 @@
-Answers to the text questions go here.
+2(f): 
+For my custom tokenizer, I used NLTK’s word_tokenize to split the text into individual words.
+I filtered the tokens by keeping only alphabetic words and converted everything to lowercase, so that words like "Prime" 
+and "prime" are counted the same. I also removed English stopwords using NLTK’s built-in stopword list to reduce the 
+number of useless features from common words like "the" or "and", which don’t help with classification.
+
+The aim was to make the feature set smaller and more focused on words that actually help tell the political parties apart.
+I used this tokenizer with TfidfVectorizer and kept the feature limit at 3000, the same as the other parts of the coursework,
+so the comparison is fair.
+
+In terms of results, my tokenizer gave a Random Forest macro F1 score of 0.4489, and the SVM got 0.5742.
+These results were similar to the default n-gram setup, but the custom tokenizer helped by reducing noise in the features.
+It didn’t boost the F1 score massively, but it simplified the feature space and made the model slightly more efficient.
+Further improvements would probably need a more advanced tokenizer or different features.
+
