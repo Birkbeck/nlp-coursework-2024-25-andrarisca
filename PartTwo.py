@@ -9,8 +9,7 @@ from sklearn.metrics import f1_score, classification_report
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-#nltk.download('punkt')
-#nltk.download('stopwords') 
+
 
 
 def rename_labour_co_op(csv_reader):
@@ -53,17 +52,11 @@ def main():
     
     with open('p2-texts/hansard40000.csv', 'r', encoding="utf-8") as file:
         reader = csv.DictReader(file)
-        # rename_labour_co_op(reader)
-        # for (idx, row) in enumerate(rename_labour_co_op(reader)):
-        #     if idx == 16:
-        #         pprint(row)
-        # pprint(count_parties(rename_labour_co_op(reader)))
         renamed = rename_labour_co_op(reader)
         print("After renaming:", len(renamed))
         cleaned_up = delete_uncommon_parties(renamed)
         print("After cleaning:", len(cleaned_up))
-            # if idx == 16:
-            #     pprint(row)
+        
         df = pd.DataFrame(cleaned_up)
         print("Shape after converting to DataFrame:", df.shape)
 
@@ -117,7 +110,6 @@ def part_two_c():
     f1_rf = f1_score(y_test, y_pred_rf, average = 'macro')
     print("\nRandom Forest Macro F1 Score:", f1_rf)
     print("Random Forest Classification Report:")
-    #print(classification_report(y_test, y_pred_rf))
     print(classification_report(y_test, y_pred_rf, zero_division=0))
     
     svm = SVC(kernel = 'linear')
@@ -126,7 +118,6 @@ def part_two_c():
     f1_svm = f1_score(y_test, y_pred_svm, average = 'macro')
     print("\nSVM Macro F1 Score:", f1_svm)
     print("SVM Classification Report:")
-    #print(classification_report(y_test, y_pred_svm))
     print(classification_report(y_test, y_pred_svm, zero_division=0))
     
 part_two_c()
@@ -156,7 +147,6 @@ def part_two_d():
     f1_rf = f1_score(y_test, y_pred_rf, average = 'macro')
     print("\nRandom Forest Macro F1 Score:", f1_rf)
     print("Random Forest Classification Report:")
-    #print(classification_report(y_test, y_pred_rf))
     print(classification_report(y_test, y_pred_rf, zero_division=0))
 
     svm = SVC(kernel = 'linear')
@@ -165,7 +155,6 @@ def part_two_d():
     f1_svm = f1_score(y_test, y_pred_svm, average = 'macro')
     print("\nSVM Macro F1 Score:", f1_svm)
     print("SVM Classification Report:")
-    #print(classification_report(y_test, y_pred_svm))
     print(classification_report(y_test, y_pred_svm, zero_division=0))
 
 
@@ -203,17 +192,16 @@ def part_two_e():
     f1_rf = f1_score(y_test, y_pred_rf, average='macro')
     print("\nRandom Forest Macro F1 Score with custom tokenizer:", f1_rf)
     print("Random Forest Classification Report:")
-    #print(classification_report(y_test, y_pred_rf))
+    
     print(classification_report(y_test, y_pred_rf, zero_division=0))
 
-    # SVM Classifier with linear kernel
+    
     svm = SVC(kernel='linear')
     svm.fit(X_train, y_train)
     y_pred_svm = svm.predict(X_test)
     f1_svm = f1_score(y_test, y_pred_svm, average='macro')
     print("\nSVM Macro F1 Score with custom tokenizer:", f1_svm)
     print("SVM Classification Report:")
-    #print(classification_report(y_test, y_pred_svm))
     print(classification_report(y_test, y_pred_svm, zero_division=0))
 
     
