@@ -1,4 +1,16 @@
-2(f): 
+PartOne (d) Flesch-Kincaid reading scores based mainly on sentence length and syllable count don’t always show how difficult 
+a text really is. For example, one situation where they can be unreliable is when a text uses complex or 
+rare vocabulary. For example, in my analysis, some novels with relatively low scores still contained difficult words or ideas.
+This shows that these measures might underestimate difficulty if they only look at sentence and word length but ignore
+vocabulary complexity.
+
+Another case is when sentence length and structure don’t reflect actual comprehension difficulty.
+Short sentences can still be confusing if the text is unclear or lacks coherence.Also, longer words aren’t always harder,
+and some short words might be tricky. Overall, these scores give a rough estimate 
+of readability but should be combined with other measures or human judgment to fully understand text difficulty.
+
+
+PartTwo (f): 
 For my custom tokenizer, I used NLTK’s word_tokenize to split the text into individual words.
 I filtered the tokens by keeping only alphabetic words and converted everything to lowercase, so that words like "Prime" 
 and "prime" are counted the same. I also removed English stopwords using NLTK’s built-in stopword list to reduce the 
