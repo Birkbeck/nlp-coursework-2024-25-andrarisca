@@ -200,3 +200,5 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# !p1-texts/
+# !p2-texts/
