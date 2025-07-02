@@ -117,7 +117,8 @@ def part_two_c():
     f1_rf = f1_score(y_test, y_pred_rf, average = 'macro')
     print("\nRandom Forest Macro F1 Score:", f1_rf)
     print("Random Forest Classification Report:")
-    print(classification_report(y_test, y_pred_rf))
+    #print(classification_report(y_test, y_pred_rf))
+    print(classification_report(y_test, y_pred_rf, zero_division=0))
     
     svm = SVC(kernel = 'linear')
     svm.fit(X_train, y_train)
@@ -125,7 +126,8 @@ def part_two_c():
     f1_svm = f1_score(y_test, y_pred_svm, average = 'macro')
     print("\nSVM Macro F1 Score:", f1_svm)
     print("SVM Classification Report:")
-    print(classification_report(y_test, y_pred_svm))
+    #print(classification_report(y_test, y_pred_svm))
+    print(classification_report(y_test, y_pred_svm, zero_division=0))
     
 part_two_c()
 
@@ -154,15 +156,19 @@ def part_two_d():
     f1_rf = f1_score(y_test, y_pred_rf, average = 'macro')
     print("\nRandom Forest Macro F1 Score:", f1_rf)
     print("Random Forest Classification Report:")
-    print(classification_report(y_test, y_pred_rf))
-    
+    #print(classification_report(y_test, y_pred_rf))
+    print(classification_report(y_test, y_pred_rf, zero_division=0))
+
     svm = SVC(kernel = 'linear')
     svm.fit(X_train, y_train)
     y_pred_svm = svm.predict(X_test)
     f1_svm = f1_score(y_test, y_pred_svm, average = 'macro')
     print("\nSVM Macro F1 Score:", f1_svm)
     print("SVM Classification Report:")
-    print(classification_report(y_test, y_pred_svm))
+    #print(classification_report(y_test, y_pred_svm))
+    print(classification_report(y_test, y_pred_svm, zero_division=0))
+
+
     
 part_two_d()
 
@@ -197,7 +203,8 @@ def part_two_e():
     f1_rf = f1_score(y_test, y_pred_rf, average='macro')
     print("\nRandom Forest Macro F1 Score with custom tokenizer:", f1_rf)
     print("Random Forest Classification Report:")
-    print(classification_report(y_test, y_pred_rf))
+    #print(classification_report(y_test, y_pred_rf))
+    print(classification_report(y_test, y_pred_rf, zero_division=0))
 
     # SVM Classifier with linear kernel
     svm = SVC(kernel='linear')
@@ -206,6 +213,8 @@ def part_two_e():
     f1_svm = f1_score(y_test, y_pred_svm, average='macro')
     print("\nSVM Macro F1 Score with custom tokenizer:", f1_svm)
     print("SVM Classification Report:")
-    print(classification_report(y_test, y_pred_svm))
+    #print(classification_report(y_test, y_pred_svm))
+    print(classification_report(y_test, y_pred_svm, zero_division=0))
+
     
 part_two_e()
